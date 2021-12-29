@@ -34,7 +34,12 @@ public class TaskController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "deleteTask")
-    public void deleteTask(Long taskId) {
+    public void deleteTask(@RequestParam Long taskId) throws TaskNotFoundException {
+        try {
+            service.deleteTask(taskId);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "updateTask")
