@@ -7,6 +7,7 @@ import com.crud.tasks.trello.config.TrelloConfig;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
@@ -20,11 +21,13 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class TrelloClient {
+    @Autowired
     private final RestTemplate restTemplate;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrelloClient.class);
 
+    @Autowired
     private final TrelloConfig trelloConfig;
-
+/*
     private URI buildURIAddress(final String apiEndpoint, final String username, final String key, final String token, final String fields, final String lists) {
         URI url = UriComponentsBuilder.fromHttpUrl(apiEndpoint + "/members/" + username + "/boards")
                 .queryParam("key", key)
@@ -36,10 +39,18 @@ public class TrelloClient {
                 .toUri();
         return url;
     }
+*/
 
     public List<TrelloBoardDto> getTrelloBoards() {
 
-        URI url = buildURIAddress(trelloConfig.getTrelloApiEndpoint(), trelloConfig.getTrelloUser(), trelloConfig.getTrelloAppKey(), trelloConfig.getTrelloToken(), "name,id", "all");
+        URI url = UriComponentsBuilder.fromHttpUrl(trelloConfig.getTrelloApiEndpoint() + "/members/" + trelloConfig.getTrelloUser() + "/boards")
+                .queryParam("key", trelloConfig.getTrelloAppKey())
+                .queryParam("token", trelloConfig.getTrelloToken())
+                .queryParam("fields", "name,id")
+                .queryParam("lists", "all")
+                .build()
+                .encode()
+                .toUri();
 
         try {
             TrelloBoardDto[] boardsResponse = restTemplate.getForObject( url, TrelloBoardDto[].class );
